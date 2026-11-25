@@ -24,7 +24,7 @@ tasks:
     dest: ./server.cfg
 
   # 4. เพิ่มคำสั่ง ensure สคริปต์ซอมบี้เข้าไปใน server.cfg อัตโนมัติ
-  - action: append_file
+  - action: replace_string
     path: ./server.cfg
     data: |
       
