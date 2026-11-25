@@ -13,20 +13,26 @@ tasks:
     subpath: resources
     dest: ./resources/[cfx-default]
 
-  # 2. เชื่อมต่อฐานข้อมูล MySQL
+  # 2. เชื่อมต่อฐานข้อมูล MySQL อัตโนมัติผ่าน txAdmin
   - action: connect_database
 
-  # 3. ดาวน์โหลด Core และ Dependencies หลักจาก GitHub
-  - action: download_github
+  # 3. ดาวน์โหลด Dependencies หลักแบบสำเร็จรูป (Release ZIP)
+  - action: download_release
     src: https://github.com
-    ref: main
-    dest: ./resources/[standalone]/oxmysql
+    asset: oxmysql.zip
+    dest: ./resources/[standalone]
 
-  - action: download_github
+  - action: download_release
     src: https://github.com
-    ref: main
-    dest: ./resources/[ox]/ox_lib
+    asset: ox_lib.zip
+    dest: ./resources/[ox]
 
+  - action: download_release
+    src: https://github.com
+    asset: ox_inventory.zip
+    dest: ./resources/[ox]
+
+  # 4. ดาวน์โหลด Core และระบบหลักจาก GitHub
   - action: download_github
     src: https://github.com
     ref: main
@@ -40,11 +46,6 @@ tasks:
   - action: download_github
     src: https://github.com
     ref: main
-    dest: ./resources/[ox]/ox_inventory
-
-  - action: download_github
-    src: https://github.com
-    ref: main
     dest: ./resources/[voice]/pma-voice
 
   - action: download_github
@@ -52,22 +53,44 @@ tasks:
     ref: main
     dest: ./resources/[standalone]/illenium-appearance
 
-  # 4. สร้างไฟล์ server.cfg พร้อมเรียงลำดับ Ensure สคริปต์ทั้งหมดตามในภาพ
+  # 5. สร้างไฟล์ server.cfg พร้อมเรียงลำดับ Ensure สคริปต์ทั้งหมดตามภาพ
   - action: write_file
     file: ./server.cfg
     data: |
+      # ==========================================
+      # NETWORK & SERVER SETTINGS
+      # ==========================================
       endpoint_add_tcp "0.0.0.0:30120"
       endpoint_add_udp "0.0.0.0:30120"
       sv_maxclients 48
       set steam_webApiKey "none"
       sv_licenseKey "{{svLicense}}"
       set mysql_connection_string "{{dbConnectionString}}"
+      set mysql_slow_query_warning 200
 
-      # [1] Core & Dependencies (ต้องรันก่อนเสมอ)
+      sv_hostname "Zombie Apocalypse Survival | Qbox"
+      sets sv_projectName "Zombie Survival"
+      sets sv_projectDesc "Qbox Zombie Apocalypse Server"
+      sets locale "th-TH"
+      sets tags "zombie, survival, qbox, apocalypse, roleplay"
+
+      # Voice & OneSync Config
+      setr voice_useNativeAudio true
+      setr voice_useSendingRangeOnly true
+      setr voice_defaultCycle "GRAVE"
+      setr voice_defaultVolume 0.3
+      setr voice_enableRadioAnim 1
+      setr ox:primaryColor "red"
+      setr ox:primaryShade 8
+
+      # ==========================================
+      # 1. CFX DEFAULT & CORE DEPENDENCIES
+      # ==========================================
       ensure mapmanager
       ensure chat
       ensure spawnmanager
       ensure baseevents
+      ensure cfxlua-require
       ensure oxmysql
       ensure ox_lib
       ensure qbx_core
@@ -75,11 +98,9 @@ tasks:
       ensure ox_inventory
       ensure pma-voice
 
-      # [2] Qbox & Standalone Modules
-      ensure illenium-appearance
-      ensure Renewed-Banking
-      ensure ox_doorlock
-      ensure ox_fuel
+      # ==========================================
+      # 2. QBOX FRAMEWORK MODULES
+      # ==========================================
       ensure qbx_adminmenu
       ensure qbx_ambulancejob
       ensure qbx_binoculars
@@ -93,14 +114,24 @@ tasks:
       ensure qbx_smallresources
       ensure qbx_vehiclekeys
       ensure qbx_vehicles
+
+      # ==========================================
+      # 3. STANDALONE & UTILITIES
+      # ==========================================
+      ensure loadscreen
+      ensure illenium-appearance
+      ensure Renewed-Banking
+      ensure ox_doorlock
+      ensure ox_fuel
       ensure scully_emotemenu
       ensure screencapture
       ensure mm_radio
       ensure mana_audio
-      ensure loadscreen
-      ensure cfxlua-require
+      ensure vehiclehandler
 
-      # [3] Maps & Apocalypse Environment
+      # ==========================================
+      # 4. MAPS & APOCALYPSE ENVIRONMENT
+      # ==========================================
       ensure bob74_ipl
       ensure apoc_decor
       ensure apoc_ruins
@@ -116,7 +147,9 @@ tasks:
       ensure ri_maps
       ensure ri_outpost_base
 
-      # [4] Tactical Clothing & Custom Vehicles
+      # ==========================================
+      # 5. CLOTHING & CUSTOM VEHICLES
+      # ==========================================
       ensure clothing_tactical_1
       ensure clothing_tactical_2
       ensure clothing_tactical_3
@@ -125,9 +158,10 @@ tasks:
       ensure clothing_tactical_6
       ensure r4tf141
       ensure r4wagner
-      ensure vehiclehandler
 
-      # [5] Zombie & Survival Systems (รันหลัง Core และ Map)
+      # ==========================================
+      # 6. ZOMBIE & SURVIVAL SYSTEMS (รันท้ายสุดเสมอ)
+      # ==========================================
       ensure nonpc
       ensure zombase
       ensure special_safezones
@@ -139,3 +173,10 @@ tasks:
       ensure ri_flamethrower
       ensure ri_bwsr2_weaponsounds
       ensure ri_anticheat
+
+      # ==========================================
+      # PERMISSIONS (txAdmin & Qbox Admin)
+      # ==========================================
+      add_ace group.admin command allow
+      add_ace group.admin command.quit deny
+      add_principal identifier.fivem:1 group.admin
