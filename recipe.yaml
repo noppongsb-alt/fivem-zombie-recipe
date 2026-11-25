@@ -54,7 +54,7 @@ tasks:
 
   # 4. สร้างไฟล์ server.cfg พร้อมเรียงลำดับ Ensure สคริปต์ทั้งหมดตามในภาพ
   - action: write_file
-    path: ./server.cfg
+    file: ./server.cfg
     data: |
       endpoint_add_tcp "0.0.0.0:30120"
       endpoint_add_udp "0.0.0.0:30120"
