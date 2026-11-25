@@ -6,31 +6,19 @@ author: YourName
 description: QBCore Base with Zombie Survival System
 
 tasks:
-  # 1. ดาวน์โหลด Base Framework (ตัวอย่างใช้ QBCore)
   - action: download_github
     src: https://github.com/qbcore-framework/txAdminRecipe
     ref: main
     dest: ./tmp/qbcore
 
-  # 2. ดาวน์โหลดสคริปต์ซอมบี้ (เปลี่ยนลิงก์เป็นสคริปต์ซอมบี้ Open-source ที่ต้องการ)
   - action: download_github
-    src: https://github.com/dislaik/esx_zombiesystem # หรือสคริปต์ซอมบี้สำหรับ QBCore
+    src: https://github.com/dislaik/esx_zombiesystem
     ref: main
     dest: ./resources/[zombie]/zombie_system
 
-  # 3. ย้ายไฟล์พื้นฐานของเซิร์ฟเวอร์
   - action: move_path
     src: ./tmp/qbcore/server.cfg
     dest: ./server.cfg
 
-  # 4. เพิ่มคำสั่ง ensure สคริปต์ซอมบี้เข้าไปใน server.cfg อัตโนมัติ
-  - action: replace_string
-    mode: partial
-    search: "# ensure some_resource"
-    replace: |
-      # ensure some_resource
-      ensure zombie_system
-
-  # 5. ลบไฟล์ชั่วคราว
   - action: remove_path
     path: ./tmp
