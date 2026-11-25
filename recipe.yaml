@@ -24,11 +24,9 @@ tasks:
     dest: ./server.cfg
 
   # 4. เพิ่มคำสั่ง ensure สคริปต์ซอมบี้เข้าไปใน server.cfg อัตโนมัติ
-  - action: replace_string
-    mode: partial
-    search: "# ensure some_resource"
-    replace: |
-      # ensure some_resource
+  - action: write_file
+    path: ./zombie_resources.cfg
+    data: |
       ensure zombie_system
 
   # 5. ลบไฟล์ชั่วคราว
