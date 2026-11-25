@@ -16,7 +16,7 @@ tasks:
   # 2. เชื่อมต่อฐานข้อมูล MySQL อัตโนมัติผ่าน txAdmin
   - action: connect_database
 
-  # 3. ดาวน์โหลดและแตกไฟล์ Dependencies หลัก (Release ZIP)
+  # 3. ดาวน์โหลดและแตกไฟล์ Dependencies หลัก (Release ZIP ตัวเต็ม)
   - action: download_file
     url: https://github.com
     path: ./tmp/oxmysql.zip
@@ -38,7 +38,7 @@ tasks:
     src: ./tmp/ox_inventory.zip
     dest: ./resources/[ox]
 
-  # 4. ดาวน์โหลด Core และระบบหลักจาก GitHub (ใส่ลิงก์เต็มทั้งหมด)
+  # 4. ดาวน์โหลด Core และระบบหลักจาก GitHub (ลิงก์ Repo เต็ม)
   - action: download_github
     src: https://github.com
     ref: main
