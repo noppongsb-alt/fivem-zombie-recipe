@@ -1,36 +1,141 @@
 $engine: 3
 $onesync: on
-name: Custom Zombie Survival Server
+name: Qbox Zombie Apocalypse Server
 version: 1.0.0
-author: YourName
-description: QBCore Base with Zombie Survival System
+author: Custom
+description: Base Qbox setup configured for custom Zombie Survival resources.
 
 tasks:
-  # 1. ดาวน์โหลด Base Framework (ตัวอย่างใช้ QBCore)
+  # 1. ดาวน์โหลดไฟล์พื้นฐานของ FiveM
   - action: download_github
-    src: https://github.com/qbcore-framework/txAdminRecipe
-    ref: main
-    dest: ./tmp/qbcore
+    src: https://github.com
+    ref: master
+    subpath: resources
+    dest: ./resources/[cfx-default]
 
-  # 2. ดาวน์โหลดสคริปต์ซอมบี้ (เปลี่ยนลิงก์เป็นสคริปต์ซอมบี้ Open-source ที่ต้องการ)
+  # 2. เชื่อมต่อฐานข้อมูล MySQL
+  - action: connect_database
+
+  # 3. ดาวน์โหลด Core และ Dependencies หลักจาก GitHub
   - action: download_github
-    src: https://github.com/dislaik/esx_zombiesystem # หรือสคริปต์ซอมบี้สำหรับ QBCore
+    src: https://github.com
     ref: main
-    dest: ./resources/[zombie]/zombie_system
+    dest: ./resources/[standalone]/oxmysql
 
-  # 3. ย้ายไฟล์พื้นฐานของเซิร์ฟเวอร์
-  - action: move_path
-    src: ./tmp/qbcore/server.cfg
-    dest: ./server.cfg
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[ox]/ox_lib
 
-  # 4. เพิ่มคำสั่ง ensure สคริปต์ซอมบี้เข้าไปใน server.cfg อัตโนมัติ
-  - action: append_file
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[qbx]/qbx_core
+
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[ox]/ox_target
+
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[ox]/ox_inventory
+
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[voice]/pma-voice
+
+  - action: download_github
+    src: https://github.com
+    ref: main
+    dest: ./resources/[standalone]/illenium-appearance
+
+  # 4. สร้างไฟล์ server.cfg พร้อมเรียงลำดับ Ensure สคริปต์ทั้งหมดตามในภาพ
+  - action: write_file
     path: ./server.cfg
     data: |
-      
-      # Zombie System
-      ensure zombie_system
+      endpoint_add_tcp "0.0.0.0:30120"
+      endpoint_add_udp "0.0.0.0:30120"
+      sv_maxclients 48
+      set steam_webApiKey "none"
+      sv_licenseKey "{{svLicense}}"
+      set mysql_connection_string "{{dbConnectionString}}"
 
-  # 5. ลบไฟล์ชั่วคราว
-  - action: remove_path
-    path: ./tmp
+      # [1] Core & Dependencies (ต้องรันก่อนเสมอ)
+      ensure mapmanager
+      ensure chat
+      ensure spawnmanager
+      ensure baseevents
+      ensure oxmysql
+      ensure ox_lib
+      ensure qbx_core
+      ensure ox_target
+      ensure ox_inventory
+      ensure pma-voice
+
+      # [2] Qbox & Standalone Modules
+      ensure illenium-appearance
+      ensure Renewed-Banking
+      ensure ox_doorlock
+      ensure ox_fuel
+      ensure qbx_adminmenu
+      ensure qbx_ambulancejob
+      ensure qbx_binoculars
+      ensure qbx_chat_theme
+      ensure qbx_management
+      ensure qbx_medical
+      ensure qbx_properties
+      ensure qbx_scoreboard
+      ensure qbx_scrapyard
+      ensure qbx_seatbelt
+      ensure qbx_smallresources
+      ensure qbx_vehiclekeys
+      ensure qbx_vehicles
+      ensure scully_emotemenu
+      ensure screencapture
+      ensure mm_radio
+      ensure mana_audio
+      ensure loadscreen
+      ensure cfxlua-require
+
+      # [3] Maps & Apocalypse Environment
+      ensure bob74_ipl
+      ensure apoc_decor
+      ensure apoc_ruins
+      ensure apoc_ymap
+      ensure greatwall
+      ensure greatwall_ymap
+      ensure observatory_hub
+      ensure pillbox
+      ensure ri_apoc_landmarks
+      ensure ri_createmap
+      ensure ri_downtown_ruins
+      ensure ri_hawick_ruins
+      ensure ri_maps
+      ensure ri_outpost_base
+
+      # [4] Tactical Clothing & Custom Vehicles
+      ensure clothing_tactical_1
+      ensure clothing_tactical_2
+      ensure clothing_tactical_3
+      ensure clothing_tactical_4
+      ensure clothing_tactical_5
+      ensure clothing_tactical_6
+      ensure r4tf141
+      ensure r4wagner
+      ensure vehiclehandler
+
+      # [5] Zombie & Survival Systems (รันหลัง Core และ Map)
+      ensure nonpc
+      ensure zombase
+      ensure special_safezones
+      ensure ri_survival
+      ensure ri_zombiepeds
+      ensure ri_boss_nemesis
+      ensure ri_zombie_gore
+      ensure ri_blood_slime
+      ensure ri_flamethrower
+      ensure ri_bwsr2_weaponsounds
+      ensure ri_anticheat
